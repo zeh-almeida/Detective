@@ -20,7 +20,7 @@ public abstract class AbstractPlayer : IPlayer
     #endregion
 
     #region Constructors
-    public AbstractPlayer(string name)
+    protected AbstractPlayer(string name)
     {
         this.Name = name;
         this._cards = new List<Card>();
@@ -104,20 +104,17 @@ public abstract class AbstractPlayer : IPlayer
     }
 
     #region Guesses
-    public bool MatchesGuess(Guess guess)
+    public Task<bool> MatchesGuess(Guess guess)
     {
-        return this.Cards
-            .Any(c => guess.WeaponCard.Equals(c)
-                                || guess.LocationCard.Equals(c)
-                                || guess.CharacterCard.Equals(c));
+        return Task.FromResult(this.GuessedCards(guess).Any());
     }
 
     protected IEnumerable<Card> GuessedCards(Guess guess)
     {
         return this.Cards
             .Where(c => guess.WeaponCard.Equals(c)
-                                || guess.LocationCard.Equals(c)
-                                || guess.CharacterCard.Equals(c)).ToArray();
+                                  || guess.LocationCard.Equals(c)
+                                  || guess.CharacterCard.Equals(c)).ToArray();
     }
     #endregion
 
@@ -127,13 +124,13 @@ public abstract class AbstractPlayer : IPlayer
     }
 
     #region Abstracts
-    public abstract Card ShowMatchedCard(Guess guess);
+    public abstract Task<Card> ShowMatchedCard(Guess guess);
 
-    public abstract Guess MakeGuess(
+    public abstract Task<Guess> MakeGuess(
         IEnumerable<Card> cards,
         IEnumerable<Guess> pastGuesses);
 
-    public abstract void ReadMatchedCard(Guess guess, Card card);
+    public abstract Task ReadMatchedCard(Guess guess, Card card);
 
     protected abstract void WhenReady();
     #endregion

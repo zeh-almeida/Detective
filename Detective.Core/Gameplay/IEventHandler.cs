@@ -3,29 +3,28 @@
 namespace Detective.Core.Gameplay;
 
 public interface IEventHandler
-
 {
     #region Game events
-    void OnGameStart();
+    Task OnGameStart();
 
-    void OnGameEnd();
+    Task OnGameEnd();
     #endregion
 
     #region Player events
-    void OnPlayerSelect(IPlayer player);
+    Task OnPlayerSelect(IPlayer player);
     #endregion
 
     #region Turn events
-    void OnNewTurn(int turnNumber);
+    Task OnNewTurn(int turnNumber);
 
-    void OnTurnEnd(int turnNumber);
+    Task OnTurnEnd(int turnNumber);
     #endregion
 
     #region Guess events
-    void OnGuessMade(Guess guess);
+    Task OnGuessMade(Guess guess);
 
-    void OnGuessMatched(Guess guess);
+    Task OnGuessMatched(Guess guess);
 
-    void OnGuessIsSolution(Guess guess);
+    Task OnGuessIsSolution(Guess guess);
     #endregion
 }

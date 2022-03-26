@@ -15,9 +15,7 @@ public abstract record AbstractCardBuilder : ICardBuilder
 
     protected static DataValues LoadData(string dataFile)
     {
-        var contents = DataFiles.ResourceManager.GetObject(dataFile) as byte[];
-
-        if (contents is null || contents.Length <= 0)
+        if (DataFiles.ResourceManager.GetObject(dataFile) is not byte[] contents || contents.Length == 0)
         {
             throw new Exception("No data found");
         }

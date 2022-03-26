@@ -70,6 +70,7 @@ public sealed record DeckBuilder : IDeckBuilder
         this.Solution = new CrimeSolution(character, location, weapon);
     }
 
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
     private void SeparatePlayerCards()
     {
         this.PlayerCards = this.Cards
@@ -78,4 +79,5 @@ public sealed record DeckBuilder : IDeckBuilder
                                   && !this.Solution.LocationCard.Equals(c))
             .ToArray();
     }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 }

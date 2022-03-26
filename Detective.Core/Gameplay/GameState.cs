@@ -70,7 +70,7 @@ public sealed record GameState
         this.HasNextTurn = true;
     }
 
-    public bool ExecuteTurn(IEventHandler eventHandler)
+    public async Task<bool> ExecuteTurn(IEventHandler eventHandler)
     {
         if (eventHandler is null)
         {
@@ -86,31 +86,33 @@ public sealed record GameState
 
         if (0.Equals(this.Turns))
         {
-            this.EventHandler.OnGameStart();
+            await this.EventHandler.OnGameStart();
         }
 
-        this.EventHandler.OnNewTurn(this.Turns);
+        await this.EventHandler.OnNewTurn(this.Turns);
 
-        _ = this.MovetoNextPlayer()
-                .MakeAGuess()
-                .ValidateGuess()
-                .ValidateSolution()
-                .ValidateNextTurn();
+        _ = await this.MovetoNextPlayer();
+        _ = await this.MakeAGuess();
+        _ = await this.ValidateGuess();
+        _ = await this.ValidateSolution();
+        _ = await this.ValidateNextTurn();
 
         return this.HasNextTurn;
     }
 
-    private GameState MovetoNextPlayer()
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8604 // Possible null reference argument.
+    private async Task<GameState> MovetoNextPlayer()
     {
         this.CurrentPlayer = this.Players.ElementAt(this.PlayerTurnIndex);
-        this.EventHandler?.OnPlayerSelect(this.CurrentPlayer);
+        await this.EventHandler?.OnPlayerSelect(this.CurrentPlayer);
 
         return this;
     }
 
-    private GameState MakeAGuess()
+    private async Task<GameState> MakeAGuess()
     {
-        var guess = this.CurrentPlayer?.MakeGuess(
+        var guess = await this.CurrentPlayer?.MakeGuess(
             this.Cards.ToArray(),
             this.Guesses.ToArray());
 
@@ -119,11 +121,11 @@ public sealed record GameState
         this.Guesses.Add(guess);
         this.CurrentGuess = guess;
 
-        this.EventHandler?.OnGuessMade(this.CurrentGuess);
+        await this.EventHandler?.OnGuessMade(this.CurrentGuess);
         return this;
     }
 
-    private GameState ValidateGuess()
+    private async Task<GameState> ValidateGuess()
     {
         var playerCount = this.Players.Count();
         this.GuessHasMatch = false;
@@ -139,7 +141,7 @@ public sealed record GameState
 
             var otherPlayer = this.Players.ElementAt(otherPlayerIndex);
 
-            this.GuessHasMatch = otherPlayer.MatchesGuess(this.CurrentGuess);
+            this.GuessHasMatch = await otherPlayer.MatchesGuess(this.CurrentGuess);
 
             if (this.GuessHasMatch)
             {
@@ -147,11 +149,11 @@ public sealed record GameState
 
                 if (!otherPlayer.Equals(this.CurrentPlayer))
                 {
-                    var card = otherPlayer.ShowMatchedCard(this.CurrentGuess);
-                    this.CurrentPlayer?.ReadMatchedCard(this.CurrentGuess, card);
+                    var card = await otherPlayer.ShowMatchedCard(this.CurrentGuess);
+                    await this.CurrentPlayer?.ReadMatchedCard(this.CurrentGuess, card);
                 }
 
-                this.EventHandler?.OnGuessMatched(this.CurrentGuess);
+                await this.EventHandler?.OnGuessMatched(this.CurrentGuess);
                 break;
             }
         }
@@ -159,7 +161,7 @@ public sealed record GameState
         return this;
     }
 
-    private GameState ValidateSolution()
+    private async Task<GameState> ValidateSolution()
     {
         if (!this.GuessHasMatch)
         {
@@ -170,18 +172,18 @@ public sealed record GameState
                 throw new Exception("Guess matches no cards nor solution?");
             }
 
-            this.EventHandler?.OnGuessIsSolution(this.CurrentGuess);
+            await this.EventHandler?.OnGuessIsSolution(this.CurrentGuess);
             this.HasNextTurn = false;
         }
 
         return this;
     }
 
-    private GameState ValidateNextTurn()
+    private async Task<GameState> ValidateNextTurn()
     {
         if (!this.HasNextTurn)
         {
-            this.EventHandler?.OnGameEnd();
+            await this.EventHandler?.OnGameEnd();
         }
         else
         {
@@ -192,10 +194,12 @@ public sealed record GameState
                 this.PlayerTurnIndex = 0;
             }
 
-            this.EventHandler?.OnTurnEnd(this.Turns);
+            await this.EventHandler?.OnTurnEnd(this.Turns);
             this.Turns++;
         }
 
         return this;
     }
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 }

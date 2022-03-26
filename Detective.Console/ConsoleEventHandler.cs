@@ -1,70 +1,68 @@
 ﻿using Detective.Core.Gameplay;
 using Detective.Core.Players;
 
-namespace Detective.Console;
+namespace Detective.ConsoleUI;
 
 public sealed record ConsoleEventHandler : IEventHandler
 {
-    #region Properties
-    private TextWriter Writer { get; }
-    #endregion
-
-    #region Constructors
-    public ConsoleEventHandler(TextWriter writer)
-    {
-        this.Writer = writer;
-    }
-    #endregion
-
-    public void OnPlayerSelect(IPlayer _)
+    public Task OnPlayerSelect(IPlayer _)
     {
         // nothing
+        return Task.CompletedTask;
     }
 
-    public void OnGameStart()
+    public Task OnGameStart()
     {
-        this.Writer.WriteLine("Detective Game!");
+        Console.WriteLine("Detective Game!");
+        return Task.CompletedTask;
     }
 
-    public void OnGameEnd()
+    public Task OnGameEnd()
     {
-        this.Writer.WriteLine("\n\nGame over");
+        Console.WriteLine("\n\nGame over");
+        return Task.CompletedTask;
     }
 
-    public void OnNewTurn(int turnNumber)
+    public Task OnNewTurn(int turnNumber)
     {
-        this.Writer.WriteLine("---");
-        this.Writer.WriteLine($"Turn {turnNumber + 1}:");
+        Console.WriteLine($"Turn {turnNumber + 1}:");
+        return Task.CompletedTask;
     }
 
-    public void OnTurnEnd(int _)
+    public Task OnTurnEnd(int _)
     {
-        this.Writer.WriteLine();
+        Console.WriteLine("---");
+        return Task.CompletedTask;
     }
 
-    public void OnGuessMade(Guess guess)
+    public Task OnGuessMade(Guess guess)
     {
-        this.Writer.WriteLine($"\tPlayer '{guess.Guesser.Name}' made a guess: {guess}");
+        Console.WriteLine($"\tPlayer '{guess.Guesser.Name}' made a guess: {guess}");
+        return Task.CompletedTask;
     }
 
-    public void OnGuessMatched(Guess guess)
+    public Task OnGuessMatched(Guess guess)
     {
         if (!guess.Guesser.Equals(guess.Responder))
         {
-            this.Writer.WriteLine($"\tPlayer '{guess.Guesser.Name}' guess answered by Player '{guess.Responder?.Name}'");
+            Console.WriteLine($"\tPlayer '{guess.Guesser.Name}' guess answered by Player '{guess.Responder?.Name}'");
         }
         else
         {
-            this.Writer.WriteLine($"\tPlayer '{guess.Guesser.Name}' guess answered by itself");
+            Console.WriteLine($"\tPlayer '{guess.Guesser.Name}' guess answered by itself");
         }
+
+        return Task.CompletedTask;
     }
 
-    public void OnGuessIsSolution(Guess guess)
+    public Task OnGuessIsSolution(Guess guess)
     {
-        this.Writer.WriteLine("---");
-        this.Writer.WriteLine("---");
-        this.Writer.WriteLine("Case solved:");
+        Console.WriteLine("---");
+        Console.WriteLine("---");
+        Console.WriteLine("Case solved:");
 
-        this.Writer.WriteLine($"Player '{guess.Guesser.Name}' cracked the case: {guess}");
+        Console.WriteLine($"Player '{guess.Guesser.Name}' cracked the case: {guess}");
+
+        return Task.CompletedTask;
     }
 }

@@ -5,11 +5,11 @@ VisualStudioVersion = 17.2.32314.265
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Detective.Core", "Detective.Core\Detective.Core.csproj", "{F9F4D0AC-FDF5-4F3B-BD19-925202ADB0CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detective.Console", "Detective.Console\Detective.Console.csproj", "{13178A02-0323-4750-B4B1-9B1B05ECA1AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Detective.ConsoleUI", "Detective.Console\Detective.ConsoleUI.csproj", "{13178A02-0323-4750-B4B1-9B1B05ECA1AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detective.Players", "Detective.Players\Detective.Players.csproj", "{1A8785DC-E1BE-4110-BC40-F8C248583984}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Detective.Players", "Detective.Players\Detective.Players.csproj", "{1A8785DC-E1BE-4110-BC40-F8C248583984}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detective.Cards", "Detective.Cards\Detective.Cards.csproj", "{581B1EDE-D6B6-4A15-970B-E9505EFD8A07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Detective.Cards", "Detective.Cards\Detective.Cards.csproj", "{581B1EDE-D6B6-4A15-970B-E9505EFD8A07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

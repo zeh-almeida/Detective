@@ -20,13 +20,13 @@ public interface IPlayer : IEquatable<IPlayer?>, IComparable<IPlayer?>
 
     bool IsReady();
 
-    Card ShowMatchedCard(Guess guess);
+    Task<Card> ShowMatchedCard(Guess guess);
 
-    bool MatchesGuess(Guess guess);
+    Task<bool> MatchesGuess(Guess guess);
 
-    void ReadMatchedCard(Guess guess, Card card);
+    Task ReadMatchedCard(Guess guess, Card card);
 
-    Guess MakeGuess(
+    Task<Guess> MakeGuess(
         IEnumerable<Card> cards,
         IEnumerable<Guess> pastGuesses);
 }

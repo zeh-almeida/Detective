@@ -8,7 +8,7 @@ namespace Detective.Players;
 public sealed class DumbPlayer : AbstractPlayer
 {
     #region Properties
-    private ISet<Card> SeenCards { get; set; }
+    private ISet<Card> SeenCards { get; }
     #endregion
 
     #region Constructors
@@ -19,46 +19,50 @@ public sealed class DumbPlayer : AbstractPlayer
     }
     #endregion
 
-    public override Guess MakeGuess(
+    public override Task<Guess> MakeGuess(
         IEnumerable<Card> cards,
         IEnumerable<Guess> _pastGuesses)
     {
-        var missing = cards.Where(c => !this.SeenCards.Contains(c));
-
-        var weaponCard = RandomlySelectCard(missing.Where(c => c.IsWeapon()));
-        var locationCard = RandomlySelectCard(missing.Where(c => c.IsLocation()));
-        var characterCard = RandomlySelectCard(missing.Where(c => c.IsCharacter()));
-
-        if (weaponCard is null)
+        return Task.Run(() =>
         {
-            throw new Exception("Weapon card is not a Weapon?");
-        }
+            var missing = cards.Where(c => !this.SeenCards.Contains(c));
 
-        if (locationCard is null)
-        {
-            throw new Exception("Location card is not a Location?");
-        }
+            var weaponCard = RandomlySelectCard(missing.Where(c => c.IsWeapon()));
+            var locationCard = RandomlySelectCard(missing.Where(c => c.IsLocation()));
+            var characterCard = RandomlySelectCard(missing.Where(c => c.IsCharacter()));
 
-        if (characterCard is null)
-        {
-            throw new Exception("Character card is not a Character?");
-        }
+            if (weaponCard is null)
+            {
+                throw new Exception("Weapon card is not a Weapon?");
+            }
 
-        return new Guess(
-            this,
-            characterCard,
-            locationCard,
-            weaponCard);
+            if (locationCard is null)
+            {
+                throw new Exception("Location card is not a Location?");
+            }
+
+            if (characterCard is null)
+            {
+                throw new Exception("Character card is not a Character?");
+            }
+
+            return new Guess(
+                this,
+                characterCard,
+                locationCard,
+                weaponCard);
+        });
     }
 
-    public override void ReadMatchedCard(Guess guess, Card card)
+    public override Task ReadMatchedCard(Guess guess, Card card)
     {
         _ = this.SeenCards.Add(card);
+        return Task.CompletedTask;
     }
 
-    public override Card ShowMatchedCard(Guess guess)
+    public override Task<Card> ShowMatchedCard(Guess guess)
     {
-        return this.GuessedCards(guess).First();
+        return Task.FromResult(this.GuessedCards(guess).First());
     }
 
     public override string ToString()

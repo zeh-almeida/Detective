@@ -127,6 +127,7 @@ public abstract class AbstractPlayer : IPlayer
     public abstract Task<Card> ShowMatchedCard(Guess guess);
 
     public abstract Task<Guess> MakeGuess(
+        int turnNumber,
         IEnumerable<Card> cards,
         IEnumerable<Guess> pastGuesses);
 

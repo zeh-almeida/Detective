@@ -91,7 +91,7 @@ public sealed record GameState
 
         await this.EventHandler.OnNewTurn(this.Turns);
 
-        _ = await this.MovetoNextPlayer();
+        _ = await this.MoveToNextPlayer();
         _ = await this.MakeAGuess();
         _ = await this.ValidateGuess();
         _ = await this.ValidateSolution();
@@ -102,7 +102,7 @@ public sealed record GameState
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 #pragma warning disable CS8604 // Possible null reference argument.
-    private async Task<GameState> MovetoNextPlayer()
+    private async Task<GameState> MoveToNextPlayer()
     {
         this.CurrentPlayer = this.Players.ElementAt(this.PlayerTurnIndex);
         await this.EventHandler?.OnPlayerSelect(this.CurrentPlayer);
@@ -113,10 +113,14 @@ public sealed record GameState
     private async Task<GameState> MakeAGuess()
     {
         var guess = await this.CurrentPlayer?.MakeGuess(
+            this.Turns,
             this.Cards.ToArray(),
             this.Guesses.ToArray());
 
-        guess.SetTurn(this.Turns);
+        if (!this.Turns.Equals(guess.Turn))
+        {
+            throw new Exception($"Player '{this.CurrentPlayer}' tried to change turns on guess");
+        }
 
         this.Guesses.Add(guess);
         this.CurrentGuess = guess;

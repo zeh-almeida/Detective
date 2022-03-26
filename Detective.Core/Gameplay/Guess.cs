@@ -16,11 +16,12 @@ public sealed class Guess : IEquatable<Guess?>, IComparable<Guess?>
 
     public Card WeaponCard { get; }
 
-    public int Turn { get; private set; }
+    public int Turn { get; }
     #endregion
 
     #region Constructors
     public Guess(
+        int turnNumber,
         IPlayer guesser,
         Card characterCard,
         Card locationCard,
@@ -51,7 +52,7 @@ public sealed class Guess : IEquatable<Guess?>, IComparable<Guess?>
         this.CharacterCard = characterCard;
         this.LocationCard = locationCard;
         this.WeaponCard = weaponCard;
-        this.Turn = -1;
+        this.Turn = turnNumber;
     }
     #endregion
 
@@ -78,27 +79,13 @@ public sealed class Guess : IEquatable<Guess?>, IComparable<Guess?>
     public bool Equals(Guess? other)
     {
         return other is not null
-            && this.CharacterCard.Equals(other.CharacterCard)
-            && this.LocationCard.Equals(other.LocationCard)
-            && this.WeaponCard.Equals(other.WeaponCard)
-            && this.Guesser.Equals(other.Guesser)
             && this.Turn.Equals(other.Turn)
-            && Equals(this.Responder, other.Responder);
+            && this.Guesser.Equals(other.Guesser);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(this.Guesser, this.Responder, this.CharacterCard, this.LocationCard, this.WeaponCard);
-    }
-
-    public void SetTurn(int turn)
-    {
-        if (!this.Turn.Equals(-1))
-        {
-            throw new Exception("Guess turn already set");
-        }
-
-        this.Turn = turn;
+        return HashCode.Combine(this.Guesser, this.Turn);
     }
 
     public int CompareTo(Guess? other)

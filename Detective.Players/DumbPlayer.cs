@@ -20,6 +20,7 @@ public sealed class DumbPlayer : AbstractPlayer
     #endregion
 
     public override Task<Guess> MakeGuess(
+        int turnNumber,
         IEnumerable<Card> cards,
         IEnumerable<Guess> _pastGuesses)
     {
@@ -47,6 +48,7 @@ public sealed class DumbPlayer : AbstractPlayer
             }
 
             return new Guess(
+                turnNumber,
                 this,
                 characterCard,
                 locationCard,

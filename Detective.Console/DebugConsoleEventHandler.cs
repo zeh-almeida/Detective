@@ -4,7 +4,7 @@ using Detective.Core.Players;
 
 namespace Detective.ConsoleUI;
 
-public sealed record ConsoleEventHandler : IEventHandler
+public sealed record DebugConsoleEventHandler : IEventHandler
 {
     public Task OnPlayerSelect(IPlayer _)
     {
@@ -14,7 +14,7 @@ public sealed record ConsoleEventHandler : IEventHandler
 
     public Task OnGameStart()
     {
-        Console.WriteLine("Detective Game!");
+        Console.WriteLine("DEBUG: Detective Game!");
         return Task.CompletedTask;
     }
 
@@ -42,11 +42,25 @@ public sealed record ConsoleEventHandler : IEventHandler
         return Task.CompletedTask;
     }
 
-    public Task OnGuessMatched(Guess guess, Card? _shownCard)
+    public Task OnGuessMatched(Guess guess, Card? shownCard)
     {
+        if (guess.Responder is null)
+        {
+            throw new Exception("Guess matched but not answered?");
+        }
+
         if (!guess.Guesser.Equals(guess.Responder))
         {
             Console.WriteLine($"\tPlayer '{guess.Responder?.Name}' answered guess by Player '{guess.Guesser.Name}'");
+
+            var cards = guess.Responder?.Cards.OrderBy(c => c).ToArray();
+            Console.WriteLine("\t\tResponder cards");
+
+            foreach (var card in cards)
+            {
+                var isMatch = card.Equals(shownCard) ? "* " : string.Empty;
+                Console.WriteLine($"\n\t\t\t{isMatch}{card}");
+            }
         }
         else
         {

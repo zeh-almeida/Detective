@@ -1,6 +1,6 @@
 ﻿namespace Detective.Core.Cards;
 
-public sealed class Card : IEquatable<Card?>
+public sealed class Card : IEquatable<Card?>, IComparable<Card>
 {
     #region Properties
     public CardType Type { get; }
@@ -55,5 +55,10 @@ public sealed class Card : IEquatable<Card?>
     public override string ToString()
     {
         return this.Value;
+    }
+
+    public int CompareTo(Card? other)
+    {
+        return other is null ? 1 : this.Value.CompareTo(other.Value);
     }
 }

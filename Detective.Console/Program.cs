@@ -4,9 +4,9 @@ using Detective.Core.Builders;
 using Detective.Core.Gameplay;
 using Detective.Players;
 
-const int numberPlayers = 3;
+const int numberPlayers = 4;
 
-var eventHandler = new ConsoleEventHandler();
+var eventHandler = new DebugConsoleEventHandler();
 var gameState = new GameState();
 
 var deckBuilder = new DeckBuilder(new ICardBuilder[] {

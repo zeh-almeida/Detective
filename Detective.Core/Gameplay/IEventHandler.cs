@@ -1,4 +1,5 @@
-﻿using Detective.Core.Players;
+﻿using Detective.Core.Cards;
+using Detective.Core.Players;
 
 namespace Detective.Core.Gameplay;
 
@@ -7,7 +8,7 @@ public interface IEventHandler
     #region Game events
     Task OnGameStart();
 
-    Task OnGameEnd();
+    Task OnGameEnd(int turnNumber);
     #endregion
 
     #region Player events
@@ -23,7 +24,7 @@ public interface IEventHandler
     #region Guess events
     Task OnGuessMade(Guess guess);
 
-    Task OnGuessMatched(Guess guess);
+    Task OnGuessMatched(Guess guess, Card? shownCard);
 
     Task OnGuessIsSolution(Guess guess);
     #endregion

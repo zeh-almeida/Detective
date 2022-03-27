@@ -150,14 +150,15 @@ public sealed record GameState
             if (this.GuessHasMatch)
             {
                 this.CurrentGuess.SetResponder(otherPlayer);
+                Card? shownCard = null;
 
                 if (!otherPlayer.Equals(this.CurrentPlayer))
                 {
-                    var card = await otherPlayer.ShowMatchedCard(this.CurrentGuess);
-                    await this.CurrentPlayer?.ReadMatchedCard(this.CurrentGuess, card);
+                    shownCard = await otherPlayer.ShowMatchedCard(this.CurrentGuess);
+                    await this.CurrentPlayer?.ReadMatchedCard(this.CurrentGuess, shownCard);
                 }
 
-                await this.EventHandler?.OnGuessMatched(this.CurrentGuess);
+                await this.EventHandler?.OnGuessMatched(this.CurrentGuess, shownCard);
                 break;
             }
         }
@@ -187,7 +188,7 @@ public sealed record GameState
     {
         if (!this.HasNextTurn)
         {
-            await this.EventHandler?.OnGameEnd();
+            await this.EventHandler?.OnGameEnd(this.Turns);
         }
         else
         {

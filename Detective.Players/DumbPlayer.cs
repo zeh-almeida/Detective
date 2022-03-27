@@ -20,6 +20,7 @@ public sealed class DumbPlayer : AbstractPlayer
 
     public override Task<Guess> MakeGuess(
         int turnNumber,
+        IPlayer _nextPlayer,
         IEnumerable<Card> cards,
         IEnumerable<Guess> _pastGuesses)
     {

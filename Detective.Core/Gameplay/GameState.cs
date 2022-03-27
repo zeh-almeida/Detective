@@ -112,8 +112,11 @@ public sealed record GameState
 
     private async Task<GameState> MakeAGuess()
     {
+        var nextPlayer = this.Players.ElementAt(this.NextPlayerIndex());
+
         var guess = await this.CurrentPlayer?.MakeGuess(
             this.Turns,
+            nextPlayer,
             this.Cards.ToArray(),
             this.Guesses.ToArray());
 
@@ -204,6 +207,17 @@ public sealed record GameState
         }
 
         return this;
+    }
+
+    private int NextPlayerIndex()
+    {
+        var nextIndex = this.PlayerTurnIndex + 1;
+        if (nextIndex >= this.Players.Count())
+        {
+            nextIndex = 0;
+        }
+
+        return nextIndex;
     }
 #pragma warning restore CS8604 // Possible null reference argument.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.

@@ -28,6 +28,7 @@ public interface IPlayer : IEquatable<IPlayer?>, IComparable<IPlayer?>
 
     Task<Guess> MakeGuess(
         int turnNumber,
+        IPlayer nextPlayer,
         IEnumerable<Card> cards,
         IEnumerable<Guess> pastGuesses);
 }

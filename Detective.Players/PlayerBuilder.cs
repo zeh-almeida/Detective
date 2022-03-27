@@ -33,7 +33,7 @@ public sealed record PlayerBuilder : IPlayerBuilder
 
         for (var index = 0; index < playerCount; index++)
         {
-            var player = new RandomPlayer($"P{index}");
+            var player = new DumbPlayer($"P{index}");
             players.Add(player);
         }
 

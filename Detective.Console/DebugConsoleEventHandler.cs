@@ -58,7 +58,7 @@ public sealed record DebugConsoleEventHandler : IEventHandler
 
             foreach (var card in cards)
             {
-                var isMatch = card.Equals(shownCard) ? "* " : string.Empty;
+                var isMatch = card.Equals(shownCard) ? "* " : "  ";
                 Console.WriteLine($"\n\t\t\t{isMatch}{card}");
             }
         }

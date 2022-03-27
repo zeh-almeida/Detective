@@ -58,9 +58,4 @@ public sealed class RandomPlayer : AbstractPlayer
 
         return Task.FromResult(randomized);
     }
-
-    public override string ToString()
-    {
-        return $"RandomPlayer {this.Name}";
-    }
 }

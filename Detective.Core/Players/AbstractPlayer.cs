@@ -62,6 +62,11 @@ public abstract class AbstractPlayer : IPlayer
     }
     #endregion
 
+    public override string ToString()
+    {
+        return $"{this.GetType().Name} {this.Name}";
+    }
+
     public void SetCharacter(string character)
     {
         if (this.Ready)
@@ -112,8 +117,6 @@ public abstract class AbstractPlayer : IPlayer
     {
         return Task.FromResult(this.GuessedCards(guess).Any());
     }
-
-    public override abstract string ToString();
 
     public virtual Task ReadMatchedCard(Guess guess, Card card)
     {

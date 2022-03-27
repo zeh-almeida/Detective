@@ -62,9 +62,4 @@ public sealed class DumbPlayer : AbstractPlayer
 
         return Task.FromResult(randomized);
     }
-
-    public override string ToString()
-    {
-        return $"DumbPlayer {this.Name}";
-    }
 }

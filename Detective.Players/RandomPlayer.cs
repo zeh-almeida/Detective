@@ -5,14 +5,14 @@ using System.Security.Cryptography;
 
 namespace Detective.Players;
 
-public sealed class DumbPlayer : AbstractPlayer
+public sealed class RandomPlayer : AbstractPlayer
 {
     #region Properties
     private ISet<Card> SeenCards { get; }
     #endregion
 
     #region Constructors
-    public DumbPlayer(string name)
+    public RandomPlayer(string name)
         : base(name)
     {
         this.SeenCards = new HashSet<Card>();
@@ -64,12 +64,15 @@ public sealed class DumbPlayer : AbstractPlayer
 
     public override Task<Card> ShowMatchedCard(Guess guess)
     {
-        return Task.FromResult(this.GuessedCards(guess).First());
+        var matchingCards = this.GuessedCards(guess);
+        var randomized = RandomlySelectCard(matchingCards);
+
+        return Task.FromResult(randomized);
     }
 
     public override string ToString()
     {
-        return $"DumbPlayer {this.Name}";
+        return $"RandomPlayer {this.Name}";
     }
 
     protected override void WhenReady()
@@ -83,6 +86,9 @@ public sealed class DumbPlayer : AbstractPlayer
     private static Card RandomlySelectCard(IEnumerable<Card> cards)
     {
         var missings = cards.ToArray();
-        return missings.OrderBy(_ => RandomNumberGenerator.GetInt32(missings.Length)).First();
+
+        return missings
+            .OrderBy(_ => RandomNumberGenerator.GetInt32(missings.Length))
+            .First();
     }
 }

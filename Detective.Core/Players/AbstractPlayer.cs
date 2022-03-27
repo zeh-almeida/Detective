@@ -1,5 +1,6 @@
 ﻿using Detective.Core.Cards;
 using Detective.Core.Gameplay;
+using System.Security.Cryptography;
 
 namespace Detective.Core.Players;
 
@@ -14,16 +15,20 @@ public abstract class AbstractPlayer : IPlayer
 
     public IEnumerable<Card> Cards => this._cards.ToArray();
 
-    private bool Ready { get; set; }
-
     public string Name { get; }
+
+    protected IDictionary<Card, IPlayer> SeenCards { get; }
+
+    private bool Ready { get; set; }
     #endregion
 
     #region Constructors
     protected AbstractPlayer(string name)
     {
         this.Name = name;
+
         this._cards = new List<Card>();
+        this.SeenCards = new Dictionary<Card, IPlayer>();
     }
     #endregion
 
@@ -89,7 +94,7 @@ public abstract class AbstractPlayer : IPlayer
             throw new Exception("Already ready!");
         }
 
-        this.Ready = this.Cards.Any()
+        this.Ready = this._cards.Count > 0
                   && this.Character is not null;
 
         if (this.Ready)
@@ -103,24 +108,22 @@ public abstract class AbstractPlayer : IPlayer
         return this.Ready;
     }
 
-    #region Guesses
     public Task<bool> MatchesGuess(Guess guess)
     {
         return Task.FromResult(this.GuessedCards(guess).Any());
     }
 
-    protected IEnumerable<Card> GuessedCards(Guess guess)
-    {
-        return this.Cards
-            .Where(c => guess.WeaponCard.Equals(c)
-                                  || guess.LocationCard.Equals(c)
-                                  || guess.CharacterCard.Equals(c)).ToArray();
-    }
-    #endregion
+    public override abstract string ToString();
 
-    public override string ToString()
+    public virtual Task ReadMatchedCard(Guess guess, Card card)
     {
-        return $"Player {this.Name}";
+        if (guess.Responder is null)
+        {
+            throw new ArgumentException("No responder set", nameof(guess));
+        }
+
+        this.SeenCards.Add(card, guess.Responder);
+        return Task.CompletedTask;
     }
 
     #region Abstracts
@@ -131,9 +134,30 @@ public abstract class AbstractPlayer : IPlayer
         IPlayer nextPlayer,
         IEnumerable<Card> cards,
         IEnumerable<Guess> pastGuesses);
-
-    public abstract Task ReadMatchedCard(Guess guess, Card card);
-
-    protected abstract void WhenReady();
     #endregion
+
+    protected IEnumerable<Card> GuessedCards(Guess guess)
+    {
+        return this._cards
+            .Where(c => guess.WeaponCard.Equals(c)
+                                  || guess.LocationCard.Equals(c)
+                                  || guess.CharacterCard.Equals(c)).ToArray();
+    }
+
+    protected virtual void WhenReady()
+    {
+        foreach (var card in this._cards)
+        {
+            this.SeenCards.Add(card, this);
+        }
+    }
+
+    protected static Card RandomlySelectCard(IEnumerable<Card> cards)
+    {
+        var missings = cards.ToArray();
+
+        return missings
+            .OrderBy(_ => RandomNumberGenerator.GetInt32(missings.Length))
+            .First();
+    }
 }

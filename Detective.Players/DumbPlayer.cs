@@ -6,15 +6,10 @@ namespace Detective.Players;
 
 public sealed class DumbPlayer : AbstractPlayer
 {
-    #region Properties
-    private ISet<Card> SeenCards { get; }
-    #endregion
-
     #region Constructors
     public DumbPlayer(string name)
         : base(name)
     {
-        this.SeenCards = new HashSet<Card>();
     }
     #endregion
 
@@ -27,7 +22,7 @@ public sealed class DumbPlayer : AbstractPlayer
         return Task.Run(() =>
         {
             var missing = cards
-                .Where(c => !this.SeenCards.Contains(c))
+                .Where(c => !this.SeenCards.ContainsKey(c))
                 .OrderBy(c => c)
                 .ToArray();
 
@@ -59,12 +54,6 @@ public sealed class DumbPlayer : AbstractPlayer
         });
     }
 
-    public override Task ReadMatchedCard(Guess guess, Card card)
-    {
-        _ = this.SeenCards.Add(card);
-        return Task.CompletedTask;
-    }
-
     public override Task<Card> ShowMatchedCard(Guess guess)
     {
         var randomized = this.GuessedCards(guess)
@@ -77,13 +66,5 @@ public sealed class DumbPlayer : AbstractPlayer
     public override string ToString()
     {
         return $"DumbPlayer {this.Name}";
-    }
-
-    protected override void WhenReady()
-    {
-        foreach (var card in this.Cards)
-        {
-            _ = this.SeenCards.Add(card);
-        }
     }
 }

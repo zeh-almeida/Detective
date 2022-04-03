@@ -13,37 +13,37 @@ public sealed record DebugConsoleEventHandler : IEventHandler
     public Task OnPlayerSelect(IPlayer _)
     {
         // nothing
-        return Task.CompletedTask;
+        return ResetColor();
     }
 
     public Task OnGameStart()
     {
         Console.WriteLine("DEBUG: Detective Game!");
-        return Task.CompletedTask;
+        return ResetColor();
     }
 
     public Task OnGameEnd(int _)
     {
         Console.WriteLine("\n\nGame over");
-        return Task.CompletedTask;
+        return ResetColor();
     }
 
     public Task OnNewTurn(int turnNumber)
     {
         Console.WriteLine($"Turn {turnNumber + 1}:");
-        return Task.CompletedTask;
+        return ResetColor();
     }
 
     public Task OnTurnEnd(int _)
     {
         Console.WriteLine(Separator);
-        return Task.CompletedTask;
+        return ResetColor();
     }
 
     public Task OnGuessMade(Guess guess)
     {
         Console.WriteLine($"\tPlayer '{guess.Guesser.Name}' made a guess: {guess}");
-        return Task.CompletedTask;
+        return ResetColor();
     }
 
     public Task OnGuessMatched(Guess guess, Card? shownCard)
@@ -71,7 +71,7 @@ public sealed record DebugConsoleEventHandler : IEventHandler
             Console.WriteLine($"\tPlayer '{guess.Guesser.Name}' guess answered by itself");
         }
 
-        return Task.CompletedTask;
+        return ResetColor();
     }
 
     public Task OnGuessIsSolution(Guess guess)
@@ -82,6 +82,12 @@ public sealed record DebugConsoleEventHandler : IEventHandler
 
         Console.WriteLine($"Player '{guess.Guesser.Name}' cracked the case: {guess}");
 
-        return Task.CompletedTask;
+        return ResetColor();
+    }
+
+    private static Task ResetColor()
+    {
+        Console.ResetColor();
+        return Console.Out.FlushAsync();
     }
 }

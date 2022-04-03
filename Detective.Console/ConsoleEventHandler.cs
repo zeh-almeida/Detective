@@ -10,44 +10,46 @@ public sealed record ConsoleEventHandler : IEventHandler
     private const string Separator = "===============================================================================";
     #endregion
 
-    public Task OnPlayerSelect(IPlayer _)
+    public async Task OnPlayerSelect(IPlayer _)
     {
         // nothing
-        return Task.CompletedTask;
+        await ResetColor();
     }
 
-    public Task OnGameStart()
+    public async Task OnGameStart()
     {
+        await ResetColor();
         Console.WriteLine("Detective Game!");
-        return Task.CompletedTask;
     }
 
-    public Task OnGameEnd(int _)
+    public async Task OnGameEnd(int _)
     {
+        await ResetColor();
         Console.WriteLine("\n\nGame over");
-        return Task.CompletedTask;
     }
 
-    public Task OnNewTurn(int turnNumber)
+    public async Task OnNewTurn(int turnNumber)
     {
+        await ResetColor();
         Console.WriteLine($"Turn {turnNumber + 1}:");
-        return Task.CompletedTask;
     }
 
-    public Task OnTurnEnd(int _)
+    public async Task OnTurnEnd(int _)
     {
+        await ResetColor();
         Console.WriteLine(Separator);
-        return Task.CompletedTask;
     }
 
-    public Task OnGuessMade(Guess guess)
+    public async Task OnGuessMade(Guess guess)
     {
+        await ResetColor();
         Console.WriteLine($"\tPlayer '{guess.Guesser.Name}' made a guess: {guess}");
-        return Task.CompletedTask;
     }
 
-    public Task OnGuessMatched(Guess guess, Card? _shownCard)
+    public async Task OnGuessMatched(Guess guess, Card? _shownCard)
     {
+        await ResetColor();
+
         if (!guess.Guesser.Equals(guess.Responder))
         {
             Console.WriteLine($"\tPlayer '{guess.Responder?.Name}' answered guess by Player '{guess.Guesser.Name}'");
@@ -56,18 +58,26 @@ public sealed record ConsoleEventHandler : IEventHandler
         {
             Console.WriteLine($"\tPlayer '{guess.Guesser.Name}' guess answered by itself");
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task OnGuessIsSolution(Guess guess)
+    public async Task OnGuessIsSolution(Guess guess)
     {
+        await ResetColor();
+
         Console.WriteLine(Separator);
         Console.WriteLine(Separator);
         Console.WriteLine($"Case solved: at turn {guess.Turn + 1}");
 
         Console.WriteLine($"Player '{guess.Guesser.Name}' cracked the case: {guess}");
+    }
 
-        return Task.CompletedTask;
+    private static async Task ResetColor()
+    {
+        await Console.Out.FlushAsync();
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.BackgroundColor = ConsoleColor.Black;
+
+        await Console.Out.FlushAsync();
     }
 }

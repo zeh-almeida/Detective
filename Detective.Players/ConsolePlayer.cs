@@ -19,91 +19,93 @@ public sealed class ConsolePlayer : AbstractPlayer
     }
     #endregion
 
-    public override Task<Guess> MakeGuess(
+    public override async Task<Guess> MakeGuess(
         int turnNumber,
         IPlayer nextPlayer,
         IEnumerable<Card> cards,
         IEnumerable<Guess> pastGuesses)
     {
-        return Task.Run(() =>
-        {
-            Console.WriteLine(PlayerStart);
-            Console.WriteLine($"'{this}' should make a guess:");
+        await UsePlayerColor();
 
-            var guess = this.MakeAction(turnNumber, cards);
-            Console.WriteLine(PlayerEnd);
+        Console.WriteLine(PlayerStart);
+        Console.WriteLine($"'{this}' should make a guess:");
 
-            return guess ?? throw new Exception("Guess wasn't made?");
-        });
+        var guess = this.MakeAction(turnNumber, cards);
+
+        Console.WriteLine(PlayerEnd);
+        await ResetColor();
+
+        return guess ?? throw new Exception("Guess wasn't made?");
     }
 
-    public override Task<Card?> ShowMatchedCard(Guess guess)
+    public override async Task<Card?> ShowMatchedCard(Guess guess)
     {
-        return Task.Run(() =>
+        await UsePlayerColor();
+
+        Console.WriteLine(PlayerStart);
+        Console.WriteLine($"'{this}' must show a card:");
+
+        Card? selectedCard = null;
+
+        var cards = this.GuessedCards(guess)
+            .OrderBy(c => c)
+            .ToArray();
+
+        if (cards.Length == 1)
         {
-            Console.WriteLine(PlayerStart);
-            Console.WriteLine($"'{this}' must show a card:");
+            selectedCard = cards.FirstOrDefault();
+            Console.WriteLine($"\t\tSelected matched card: {selectedCard}");
 
-            Card? selectedCard = null;
-
-            var cards = this.GuessedCards(guess)
-                .OrderBy(c => c)
-                .ToArray();
-
-            if (cards.Length == 1)
+            Console.Write("\tPress 'enter' to continue");
+            _ = Console.Read();
+        }
+        else
+        {
+            var isSelected = false;
+            while (!isSelected)
             {
-                selectedCard = cards.FirstOrDefault();
-                Console.WriteLine($"\t\tSelected matched card: {selectedCard}");
+                Console.WriteLine("\n\tSelect matched card:");
 
-                Console.Write("\tPress 'enter' to continue");
-                _ = Console.Read();
-            }
-            else
-            {
-                var isSelected = false;
-                while (!isSelected)
+                for (var index = 0; index < cards.Length; index++)
                 {
-                    Console.WriteLine("\n\tSelect matched card:");
-
-                    for (var index = 0; index < cards.Length; index++)
-                    {
-                        Console.WriteLine($"\t\t{index + 1}- {cards[index]}");
-                    }
-
-                    var optionNumber = ValidateOption(1, cards.Length);
-
-                    if (optionNumber == -1)
-                    {
-                        continue;
-                    }
-
-                    selectedCard = cards[optionNumber - 1];
-                    Console.WriteLine($"\t\tSelected matched card: {selectedCard}");
-
-                    isSelected = true;
+                    Console.WriteLine($"\t\t{index + 1}- {cards[index]}");
                 }
-            }
 
-            Console.WriteLine(PlayerEnd);
-            return selectedCard;
-        });
+                var optionNumber = ValidateOption(1, cards.Length);
+
+                if (optionNumber == -1)
+                {
+                    continue;
+                }
+
+                selectedCard = cards[optionNumber - 1];
+                Console.Write($"\t\tSelected matched card: {selectedCard}");
+
+                isSelected = true;
+            }
+        }
+
+        Console.WriteLine($"\n{PlayerEnd}");
+        await ResetColor();
+
+        return selectedCard;
     }
 
     public override async Task ReadMatchedCard(Guess guess, Card card)
     {
         await base.ReadMatchedCard(guess, card);
 
-        await Task.Run(() =>
-        {
-            Console.WriteLine(PlayerStart);
-            Console.WriteLine($"'{guess.Responder}' matched with '{this}' guess:");
-            Console.WriteLine($"\t'{card}' was shown\n");
+        await UsePlayerColor();
 
-            Console.Write("\tPress 'enter' to continue");
-            _ = Console.Read();
+        Console.WriteLine(PlayerStart);
+        Console.WriteLine($"'{guess.Responder}' matched with '{this}' guess:");
+        Console.WriteLine($"\t'{card}' was shown\n");
 
-            Console.WriteLine(PlayerEnd);
-        });
+        Console.Write("\tPress 'enter' to continue");
+        _ = Console.Read();
+
+        Console.WriteLine(PlayerEnd);
+        await ResetColor();
     }
 
     private void PrintHandCards()
@@ -285,5 +287,25 @@ public sealed class ConsolePlayer : AbstractPlayer
         }
 
         return optionNumber;
+    }
+
+    private static async Task UsePlayerColor()
+    {
+        await Console.Out.FlushAsync();
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.BackgroundColor = ConsoleColor.Black;
+
+        await Console.Out.FlushAsync();
+    }
+
+    private static async Task ResetColor()
+    {
+        await Console.Out.FlushAsync();
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.BackgroundColor = ConsoleColor.Black;
+
+        await Console.Out.FlushAsync();
     }
 }

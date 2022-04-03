@@ -116,7 +116,7 @@ public sealed class ConsolePlayer : AbstractPlayer
         for (var index = 0; index < cards.Length; index++)
         {
             var card = cards[index];
-            Console.WriteLine($"\t\t{index + 1}- {card}");
+            Console.WriteLine($"\t\t{WriteIndex(index)}- {card}");
         }
     }
 
@@ -128,10 +128,20 @@ public sealed class ConsolePlayer : AbstractPlayer
             .OrderBy(p => p.Key)
             .ToArray();
 
+        if (otherCards.Length == 0)
+        {
+            Console.WriteLine("\t\tHaven't seen a card yet");
+            return;
+        }
+
+        var maxKeyLength = otherCards.Max(c => c.Key.ToString().Length);
+
         for (var index = 0; index < otherCards.Length; index++)
         {
             var pair = otherCards[index];
-            Console.WriteLine($"\t\t{index + 1}- {pair.Key}\t'{pair.Value}'");
+
+            var key = AddSpacesToValue(pair.Key.ToString(), maxKeyLength);
+            Console.WriteLine($"\t\t{WriteIndex(index)}- {key}'{pair.Value}'");
         }
     }
 
@@ -146,7 +156,7 @@ public sealed class ConsolePlayer : AbstractPlayer
         for (var index = 0; index < otherCards.Length; index++)
         {
             var card = otherCards[index];
-            Console.WriteLine($"\t\t{index + 1}- {card}");
+            Console.WriteLine($"\t\t{WriteIndex(index)}- {card}");
         }
     }
 
@@ -157,11 +167,20 @@ public sealed class ConsolePlayer : AbstractPlayer
 
         while (!hasOption)
         {
+            var options = new string[] {
+                "List cards at hand",
+                "List seen cards",
+                "List unknown cards",
+                "Make a guess",
+            };
+
             Console.WriteLine("\n\tWhat will you do?");
-            Console.WriteLine("\t\tList cards at hand: 1");
-            Console.WriteLine("\t\tList seen cards: 2");
-            Console.WriteLine("\t\tList unknown cards: 3");
-            Console.WriteLine("\t\tMake a guess: 4");
+
+            var maxKeyLength = options.Max(c => c.Length);
+            for (var index = 0; index < options.Length; index++)
+            {
+                Console.WriteLine($"\t\t{WriteIndex(index)}- {options[index]}");
+            }
 
             var optionNumber = ValidateOption(1, 5);
 
@@ -242,13 +261,25 @@ public sealed class ConsolePlayer : AbstractPlayer
                 .OrderBy(c => c)
                 .ToArray();
 
+            var maxKeyLength = toSelect.Max(c => c.ToString().Length);
+
             for (var index = 0; index < toSelect.Length; index++)
             {
                 var card = toSelect[index];
-                var owns = this.Cards.Contains(card) ? "O" : string.Empty;
-                var seen = this.SeenCards.ContainsKey(card) ? "S" : string.Empty;
 
-                Console.WriteLine($"\t\t{index + 1}- {card} {owns}{seen}");
+                var state = string.Empty;
+
+                if (this.Cards.Contains(card))
+                {
+                    state = "O";
+                }
+                else if (this.SeenCards.ContainsKey(card))
+                {
+                    state = "S";
+                }
+
+                var key = AddSpacesToValue(card.ToString(), maxKeyLength);
+                Console.WriteLine($"\t\t{WriteIndex(index)}- {key}{state}");
             }
 
             var optionNumber = ValidateOption(1, toSelect.Length);
@@ -265,6 +296,18 @@ public sealed class ConsolePlayer : AbstractPlayer
         }
 
         return selectedCard;
+    }
+
+    private static string AddSpacesToValue(string value, int numberMaxChars)
+    {
+        var spaces = new string(' ', numberMaxChars - value.Length + 2);
+        return $"{value}{spaces}";
+    }
+
+    private static string WriteIndex(int index)
+    {
+        var value = (index + 1).ToString();
+        return value.PadLeft(2, '0');
     }
 
     private static int ValidateOption(int minValue, int maxValue)

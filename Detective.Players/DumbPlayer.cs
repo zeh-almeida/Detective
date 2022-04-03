@@ -54,11 +54,11 @@ public sealed class DumbPlayer : AbstractPlayer
         });
     }
 
-    public override Task<Card> ShowMatchedCard(Guess guess)
+    public override Task<Card?> ShowMatchedCard(Guess guess)
     {
         var randomized = this.GuessedCards(guess)
             .OrderBy(c => c)
-            .First();
+            .FirstOrDefault();
 
         return Task.FromResult(randomized);
     }

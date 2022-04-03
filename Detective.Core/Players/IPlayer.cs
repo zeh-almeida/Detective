@@ -20,7 +20,7 @@ public interface IPlayer : IEquatable<IPlayer?>, IComparable<IPlayer?>
 
     bool IsReady();
 
-    Task<Card> ShowMatchedCard(Guess guess);
+    Task<Card?> ShowMatchedCard(Guess guess);
 
     Task<bool> MatchesGuess(Guess guess);
 

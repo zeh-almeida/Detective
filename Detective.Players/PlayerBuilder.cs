@@ -33,8 +33,16 @@ public sealed record PlayerBuilder : IPlayerBuilder
 
         for (var index = 0; index < playerCount; index++)
         {
-            var player = new DumbPlayer($"P{index}");
-            players.Add(player);
+            if (index == 0)
+            {
+                var player = new ConsolePlayer($"P{index}");
+                players.Add(player);
+            }
+            else
+            {
+                var player = new DumbPlayer($"P{index}");
+                players.Add(player);
+            }
         }
 
         return players;

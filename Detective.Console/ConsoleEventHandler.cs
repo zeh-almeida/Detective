@@ -6,6 +6,10 @@ namespace Detective.ConsoleUI;
 
 public sealed record ConsoleEventHandler : IEventHandler
 {
+    #region Constants
+    private const string Separator = "===============================================================================";
+    #endregion
+
     public Task OnPlayerSelect(IPlayer _)
     {
         // nothing
@@ -32,7 +36,7 @@ public sealed record ConsoleEventHandler : IEventHandler
 
     public Task OnTurnEnd(int _)
     {
-        Console.WriteLine("---");
+        Console.WriteLine(Separator);
         return Task.CompletedTask;
     }
 
@@ -58,8 +62,8 @@ public sealed record ConsoleEventHandler : IEventHandler
 
     public Task OnGuessIsSolution(Guess guess)
     {
-        Console.WriteLine("---");
-        Console.WriteLine("---");
+        Console.WriteLine(Separator);
+        Console.WriteLine(Separator);
         Console.WriteLine($"Case solved: at turn {guess.Turn + 1}");
 
         Console.WriteLine($"Player '{guess.Guesser.Name}' cracked the case: {guess}");

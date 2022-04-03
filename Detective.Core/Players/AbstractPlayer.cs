@@ -130,7 +130,7 @@ public abstract class AbstractPlayer : IPlayer
     }
 
     #region Abstracts
-    public abstract Task<Card> ShowMatchedCard(Guess guess);
+    public abstract Task<Card?> ShowMatchedCard(Guess guess);
 
     public abstract Task<Guess> MakeGuess(
         int turnNumber,

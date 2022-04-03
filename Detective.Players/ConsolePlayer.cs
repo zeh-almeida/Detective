@@ -10,6 +10,12 @@ public sealed class ConsolePlayer : AbstractPlayer
     private const string PlayerStart = "\n< Player Start >";
 
     private const string PlayerEnd = "< Player End >\n";
+
+    private static string[] Options { get; } = new string[]
+    {
+        "List cards",
+        "Make a guess",
+    };
     #endregion
 
     #region Constructors
@@ -108,58 +114,6 @@ public sealed class ConsolePlayer : AbstractPlayer
         await ResetColor();
     }
 
-    private void PrintHandCards()
-    {
-        Console.WriteLine("\n\tYour cards:");
-        var cards = this.Cards.OrderBy(c => c).ToArray();
-
-        for (var index = 0; index < cards.Length; index++)
-        {
-            var card = cards[index];
-            Console.WriteLine($"\t\t{WriteIndex(index)}- {card}");
-        }
-    }
-
-    private void PrintSeenCards()
-    {
-        Console.WriteLine("\n\tSeen cards:");
-        var otherCards = this.SeenCards
-            .Where(c => !this.Cards.Contains(c.Key))
-            .OrderBy(p => p.Key)
-            .ToArray();
-
-        if (otherCards.Length == 0)
-        {
-            Console.WriteLine("\t\tHaven't seen a card yet");
-            return;
-        }
-
-        var maxKeyLength = otherCards.Max(c => c.Key.ToString().Length);
-
-        for (var index = 0; index < otherCards.Length; index++)
-        {
-            var pair = otherCards[index];
-
-            var key = AddSpacesToValue(pair.Key.ToString(), maxKeyLength);
-            Console.WriteLine($"\t\t{WriteIndex(index)}- {key}'{pair.Value}'");
-        }
-    }
-
-    private void PrintMissingCards(IEnumerable<Card> cards)
-    {
-        Console.WriteLine("\n\tMissing cards:");
-        var otherCards = cards
-            .Where(c => !this.SeenCards.ContainsKey(c))
-            .OrderBy(c => c)
-            .ToArray();
-
-        for (var index = 0; index < otherCards.Length; index++)
-        {
-            var card = otherCards[index];
-            Console.WriteLine($"\t\t{WriteIndex(index)}- {card}");
-        }
-    }
-
     private Guess? MakeAction(int turnNumber, IEnumerable<Card> cards)
     {
         var hasOption = false;
@@ -167,22 +121,15 @@ public sealed class ConsolePlayer : AbstractPlayer
 
         while (!hasOption)
         {
-            var options = new string[] {
-                "List cards at hand",
-                "List seen cards",
-                "List unknown cards",
-                "Make a guess",
-            };
-
             Console.WriteLine("\n\tWhat will you do?");
 
-            var maxKeyLength = options.Max(c => c.Length);
-            for (var index = 0; index < options.Length; index++)
+            var maxKeyLength = Options.Max(c => c.Length);
+            for (var index = 0; index < Options.Length; index++)
             {
-                Console.WriteLine($"\t\t{WriteIndex(index)}- {options[index]}");
+                Console.WriteLine($"\t\t{WriteIndex(index)}- {Options[index]}");
             }
 
-            var optionNumber = ValidateOption(1, options.Length);
+            var optionNumber = ValidateOption(1, Options.Length);
 
             if (optionNumber == -1)
             {
@@ -192,18 +139,13 @@ public sealed class ConsolePlayer : AbstractPlayer
             switch (optionNumber)
             {
                 case 1:
-                    this.PrintHandCards();
+                    Console.WriteLine($"\n\t\t--{Options[optionNumber - 1]}");
+                    this.PrintAllCards(cards);
                     break;
 
                 case 2:
-                    this.PrintSeenCards();
-                    break;
+                    Console.WriteLine($"\n\t\t--{Options[optionNumber - 1]}");
 
-                case 3:
-                    this.PrintMissingCards(cards);
-                    break;
-
-                case 4:
                     guess = this.SelectCardsGuess(turnNumber, cards);
                     hasOption = true;
                     break;
@@ -253,34 +195,13 @@ public sealed class ConsolePlayer : AbstractPlayer
 
         while (!isSelected)
         {
-            Console.WriteLine($"\n\tSelect a {cardType}:");
-            Console.WriteLine("\t\tO - means you own this card");
-            Console.WriteLine("\t\tS - means you have seen this card\n");
+            Console.WriteLine($"\n\t\tSelect a {cardType}:");
 
             var toSelect = cards
                 .OrderBy(c => c)
                 .ToArray();
 
-            var maxKeyLength = toSelect.Max(c => c.ToString().Length);
-
-            for (var index = 0; index < toSelect.Length; index++)
-            {
-                var card = toSelect[index];
-
-                var state = string.Empty;
-
-                if (this.Cards.Contains(card))
-                {
-                    state = "O";
-                }
-                else if (this.SeenCards.ContainsKey(card))
-                {
-                    state = "S";
-                }
-
-                var key = AddSpacesToValue(card.ToString(), maxKeyLength);
-                Console.WriteLine($"\t\t{WriteIndex(index)}- {key}{state}");
-            }
+            this.PrintCards(toSelect);
 
             var optionNumber = ValidateOption(1, toSelect.Length);
 
@@ -296,6 +217,55 @@ public sealed class ConsolePlayer : AbstractPlayer
         }
 
         return selectedCard;
+    }
+
+    private void PrintAllCards(IEnumerable<Card> cards)
+    {
+        var weapons = cards
+            .Where(c => c.IsWeapon());
+
+        var locations = cards
+            .Where(c => c.IsLocation());
+
+        var characters = cards
+            .Where(c => c.IsCharacter());
+
+        Console.WriteLine("\n\t\tWeapons:");
+        this.PrintCards(weapons);
+
+        Console.WriteLine("\n\t\tLocations:");
+        this.PrintCards(locations);
+
+        Console.WriteLine("\n\t\tCharacters:");
+        this.PrintCards(characters);
+    }
+
+    private void PrintCards(IEnumerable<Card> cards)
+    {
+        Console.WriteLine("\t\t\tO - means you own this card");
+        Console.WriteLine("\t\t\tS - means you have seen this card\n");
+
+        var toSelect = cards.OrderBy(c => c).ToArray();
+        var maxKeyLength = toSelect.Max(c => c.ToString().Length);
+
+        for (var index = 0; index < toSelect.Length; index++)
+        {
+            var card = toSelect[index];
+
+            var state = string.Empty;
+
+            if (this.Cards.Contains(card))
+            {
+                state = "O";
+            }
+            else if (this.SeenCards.ContainsKey(card))
+            {
+                state = $"S -> '{this.SeenCards[card]}'";
+            }
+
+            var key = AddSpacesToValue(card.ToString(), maxKeyLength);
+            Console.WriteLine($"\t\t\t{WriteIndex(index)}- {key}{state}");
+        }
     }
 
     private static string AddSpacesToValue(string value, int numberMaxChars)

@@ -57,7 +57,7 @@ public sealed class ConsolePlayer : AbstractPlayer
             Console.WriteLine($"\t\tSelected matched card: {selectedCard}");
 
             Console.Write("\tPress 'enter' to continue");
-            _ = Console.Read();
+            _ = Console.ReadLine();
         }
         else
         {
@@ -102,7 +102,7 @@ public sealed class ConsolePlayer : AbstractPlayer
         Console.WriteLine($"\t'{card}' was shown\n");
 
         Console.Write("\tPress 'enter' to continue");
-        _ = Console.Read();
+        _ = Console.ReadLine();
 
         Console.WriteLine(PlayerEnd);
         await ResetColor();
@@ -182,7 +182,7 @@ public sealed class ConsolePlayer : AbstractPlayer
                 Console.WriteLine($"\t\t{WriteIndex(index)}- {options[index]}");
             }
 
-            var optionNumber = ValidateOption(1, 5);
+            var optionNumber = ValidateOption(1, options.Length);
 
             if (optionNumber == -1)
             {
